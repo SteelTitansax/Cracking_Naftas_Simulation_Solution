@@ -74,23 +74,31 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         sol = solve_ivp(reactionSystem, (V_init,V_final),y0)
 
         # Consolidating outputs: 
-        dyWastes = str(sol.y[0]).replace("["," ").replace("]"," ")
-        dyVGO = str(sol.y[1]).replace("["," ").replace("]"," ")
-        dyDistilled = str(sol.y[2]).replace("["," ").replace("]"," ")
-        dyNaftas = str(sol.y[3]).replace("["," ").replace("]"," ")
-        dyGases = str(sol.y[4]).replace("["," ").replace("]"," ")
+        dyWastes = sol.y[0]
+        dyVGO = sol.y[1]
+        dyDistilled = sol.y[2]
+        dyNaftas = sol.y[3]
+        dyGases = sol.y[4]
+        t = sol.t
 
+        sol_json = []
 
+        for item in range(5):
 
-        return json.dumps(
-            { 
-                "dyWastes": dyWastes,
-                "dyVGO": dyVGO,
-                "dyDistilled": dyDistilled,
-                "dyNaftas": dyNaftas,
-                "dyGases": dyGases
-            }
-        )
+            sol_details = {
+                        "dyWastes": dyWastes[item],
+                        "dyVGO": dyVGO[item],
+                        "dyDistilled": dyDistilled[item],
+                        "dyNaftas": dyNaftas[item],
+                        "dyGases": dyGases[item],
+                        "t": t[item]
+                    }
+
+            sol_json.append(sol_details)
+
+        logging.info(sol_json)
+
+        return json.dumps(sol_json)
     
     return func.HttpResponse("Reactor design succesfully...",status_code=200)
 
